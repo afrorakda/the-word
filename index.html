@@ -50,18 +50,18 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .main-word {
-            font-size: 4.5rem;
             font-weight: 900;
-            line-height: 1;
+            line-height: 1.1;
             letter-spacing: -2px;
             word-break: break-all;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: all 0.2s ease;
+            width: 100%;
         }
-        .main-word:active { transform: scale(0.98); }
         .guide-text { font-size: 1rem; color: #ddd; font-style: italic; }
 
         /* Input Section */
@@ -86,9 +86,9 @@
         .word-input::placeholder { color: #bbb; -webkit-text-fill-color: #bbb; }
 
         .clr-btn {
-            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: #bbb; font-weight: 800; font-size: 0.8rem;
-            cursor: pointer; display: none; padding: 10px;
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: #bbb; font-weight: 800; font-size: 1.2rem;
+            cursor: pointer; display: none; padding: 10px; line-height: 1;
         }
         .clr-btn.active { display: block; }
 
@@ -127,7 +127,6 @@
             border-radius: var(--radius); font-weight: 700; font-size: 12px; cursor: pointer;
         }
 
-        /* Modals */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
@@ -137,8 +136,6 @@
             border-radius: var(--radius); text-align: left; position: relative;
         }
         .close-x { position: absolute; top: 15px; right: 20px; font-size: 20px; color: #ccc; cursor: pointer; }
-        .modal h3 { margin-top: 0; font-size: 1.2rem; }
-        .modal p { font-size: 0.9rem; line-height: 1.5; color: #555; }
     </style>
 </head>
 <body>
@@ -155,8 +152,8 @@
 
     <div class="input-section" id="inputSection">
         <div class="input-wrapper">
-            <input type="text" id="wordInput" class="word-input" placeholder="e.g. Focus, Progress, Calm" maxlength="15" oninput="toggleClr()">
-            <button class="clr-btn" id="clrBtn" onclick="clearInput()">clr</button>
+            <input type="text" id="wordInput" class="word-input" placeholder="e.g. Focus, Progress, Calm" maxlength="15" oninput="handleInput()">
+            <button class="clr-btn" id="clrBtn" onclick="clearInput()">×</button>
         </div>
         <button class="set-btn" onclick="setWord()">SET THE WORD</button>
         <div class="about-link" onclick="showAbout()">How to use?</div>
@@ -206,24 +203,24 @@
     function init() {
         const today = new Date().toISOString().split('T')[0];
         if (logs[today]) {
-            display.textContent = logs[today];
+            updateMainDisplay(logs[today]);
             inputSection.style.display = 'none';
         } else {
             display.innerHTML = '<span class="guide-text">Your word here.</span>';
+            display.style.fontSize = "1rem";
             inputSection.style.display = 'block';
         }
         renderHistory();
     }
 
-    function toggleClr() {
-        // Space restricted
+    function handleInput() {
         input.value = input.value.replace(/\s/g, '');
         clrBtn.classList.toggle('active', input.value.length > 0);
     }
 
     function clearInput() {
         input.value = '';
-        toggleClr();
+        handleInput();
         input.focus();
     }
 
@@ -234,9 +231,19 @@
         logs[today] = val;
         localStorage.setItem('theWord_logs', JSON.stringify(logs));
         
-        display.textContent = val;
+        updateMainDisplay(val);
         inputSection.style.display = 'none';
         renderHistory();
+    }
+
+    function updateMainDisplay(text) {
+        display.textContent = text;
+        // Dynamic Resizing
+        const len = text.length;
+        if (len <= 5) display.style.fontSize = "5rem";
+        else if (len <= 8) display.style.fontSize = "4rem";
+        else if (len <= 12) display.style.fontSize = "3rem";
+        else display.style.fontSize = "2.2rem";
     }
 
     function reEdit() {
@@ -244,7 +251,7 @@
         if (!logs[today]) return;
         input.value = logs[today];
         inputSection.style.display = 'block';
-        toggleClr();
+        handleInput();
     }
 
     function renderHistory() {
@@ -259,7 +266,10 @@
 
             const item = document.createElement('div');
             item.className = 'history-item';
-            item.style.opacity = 1 - (count * 0.12); // Fading effect
+            
+            // GRADATION EFFECT: 1.0 (Yesterday) down to 0.2 (7 days ago)
+            const opacity = Math.max(0.2, 1 - (count * 0.13));
+            item.style.opacity = opacity;
 
             const d = new Date(date);
             const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -269,6 +279,11 @@
             count++;
         }
     }
+
+    // Daily Reset Check
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') init();
+    });
 
     function showAbout() { document.getElementById('aboutModal').style.display = 'flex'; }
     function showInstall() { document.getElementById('installModal').style.display = 'flex'; }
