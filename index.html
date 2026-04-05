@@ -24,55 +24,52 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
+            height: 100dvh;
             -webkit-font-smoothing: antialiased;
+            overflow: hidden;
         }
 
         .container {
             width: 100%;
             max-width: 420px;
-            padding: 40px 20px;
+            padding: 30px 20px;
             box-sizing: border-box;
             text-align: center;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
         }
 
-        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px; }
-        .subtitle { font-size: 0.85rem; color: #666; font-weight: 500; margin-bottom: 30px; }
+        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 2px; letter-spacing: -1px; }
+        .subtitle { font-size: 0.8rem; color: #666; font-weight: 600; margin-bottom: 10px; }
 
-        /* Current Word Display */
-        .current-word-container {
+        /* Display Area */
+        .verdict-area {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: center;
-            min-height: 200px;
-            padding: 20px 0;
         }
 
-        .current-word {
-            font-size: 4rem;
+        .main-word {
+            font-size: 4.5rem;
             font-weight: 900;
-            letter-spacing: -2px;
-            word-wrap: break-word;
             line-height: 1;
+            letter-spacing: -2px;
+            word-break: break-all;
+            cursor: pointer;
+            transition: transform 0.1s;
         }
+        .main-word:active { transform: scale(0.98); }
+        .guide-text { font-size: 1rem; color: #ddd; font-style: italic; }
 
-        .placeholder-text {
-            color: #ddd;
-            font-style: italic;
-        }
-
-        /* Input Area */
-        .input-container {
-            position: relative;
-            margin-bottom: 40px;
-        }
-
+        /* Input Section */
+        .input-section { margin-bottom: 20px; }
+        .input-wrapper { position: relative; margin-bottom: 12px; }
         .word-input {
             width: 100%;
-            padding: 18px;
+            padding: 18px 65px 18px 18px;
             border: 2px solid var(--accent);
             border-radius: var(--radius);
             background: var(--input-bg);
@@ -88,38 +85,50 @@
         }
         .word-input::placeholder { color: #bbb; -webkit-text-fill-color: #bbb; }
 
+        .clr-btn {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: #bbb; font-weight: 800; font-size: 0.8rem;
+            cursor: pointer; display: none; padding: 10px;
+        }
+        .clr-btn.active { display: block; }
+
+        .set-btn {
+            width: 100%; padding: 18px; background: var(--main); color: #fff;
+            border: none; border-radius: var(--radius); font-size: 1.2rem; font-weight: 800;
+            cursor: pointer; transition: transform 0.1s; -webkit-tap-highlight-color: transparent;
+        }
+        .set-btn:active { transform: scale(0.98); }
+
+        .about-link {
+            display: inline-block; margin-top: 12px; font-size: 0.75rem; color: #aaa;
+            font-weight: 600; text-decoration: underline; cursor: pointer;
+        }
+
         /* History Area */
-        .history-list {
-            text-align: left;
-            margin-bottom: 30px;
-        }
-
+        .history-list { margin: 20px 0; min-height: 80px; }
         .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid #f9f9f9;
         }
+        .h-word { font-size: 1rem; font-weight: 800; }
+        .h-date { font-size: 0.7rem; font-weight: 600; color: #bbb; }
 
-        .history-date { font-size: 0.75rem; font-weight: 600; color: #aaa; }
-        .history-word { font-size: 1.1rem; font-weight: 800; }
-
-        footer { margin-top: auto; font-size: 11px; color: #aaa; line-height: 1.8; }
+        footer { font-size: 10px; color: #aaa; line-height: 1.6; }
         footer a { color: inherit; text-decoration: none; }
-        .footer-btns { margin-top: 30px; }
+        .footer-btns { margin-top: 15px; }
         .kofi-btn {
             display: inline-block; background: var(--main); color: #fff;
-            padding: 12px 25px; border-radius: var(--radius);
-            text-decoration: none; font-weight: bold; font-size: 14px; margin-bottom: 12px;
+            padding: 10px 20px; border-radius: var(--radius);
+            text-decoration: none; font-weight: bold; font-size: 13px; margin-bottom: 10px;
         }
         .home-btn {
             display: block; width: 60%; margin: 0 auto; background: var(--accent);
-            color: var(--main); border: none; padding: 10px;
-            border-radius: var(--radius); font-weight: 700; font-size: 13px; cursor: pointer;
+            color: var(--main); border: none; padding: 8px;
+            border-radius: var(--radius); font-weight: 700; font-size: 12px; cursor: pointer;
         }
 
-        #modal {
+        /* Modals */
+        .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
         }
@@ -128,27 +137,36 @@
             border-radius: var(--radius); text-align: left; position: relative;
         }
         .close-x { position: absolute; top: 15px; right: 20px; font-size: 20px; color: #ccc; cursor: pointer; }
+        .modal h3 { margin-top: 0; font-size: 1.2rem; }
+        .modal p { font-size: 0.9rem; line-height: 1.5; color: #555; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>The Word</h1>
-    <p class="subtitle">Define your day in one single word.</p>
+    <header>
+        <h1>The Word</h1>
+        <p class="subtitle">1 Day, 1 Word.</p>
+    </header>
 
-    <div class="current-word-container">
-        <div id="displayWord" class="current-word placeholder-text">Focus</div>
+    <div class="verdict-area">
+        <div id="mainDisplay" class="main-word" onclick="reEdit()"></div>
     </div>
 
-    <div class="input-container">
-        <input type="text" id="wordInput" class="word-input" placeholder="Enter today's word" maxlength="20">
+    <div class="input-section" id="inputSection">
+        <div class="input-wrapper">
+            <input type="text" id="wordInput" class="word-input" placeholder="e.g. Focus, Progress, Calm" maxlength="15" oninput="toggleClr()">
+            <button class="clr-btn" id="clrBtn" onclick="clearInput()">clr</button>
+        </div>
+        <button class="set-btn" onclick="setWord()">SET THE WORD</button>
+        <div class="about-link" onclick="showAbout()">How to use?</div>
     </div>
 
     <div class="history-list" id="historyList"></div>
 
     <div class="footer-btns">
         <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
-        <button class="home-btn" onclick="showModal()">Add to Home Screen</button>
+        <button class="home-btn" onclick="showInstall()">Add to Home Screen</button>
     </div>
 
     <footer>
@@ -157,95 +175,107 @@
     </footer>
 </div>
 
-<div id="modal" onclick="hideModal()">
+<div id="aboutModal" class="modal" onclick="hideModals()">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="close-x" onclick="hideModal()">×</span>
+        <span class="close-x" onclick="hideModals()">×</span>
+        <h3>How to use</h3>
+        <p>1. Capture your day in exactly <strong>one word</strong>.</p>
+        <p>2. Tap 'SET' to seal your choice. The entry is locked at 0:00 every night.</p>
+        <p>3. Review your past 7 days as they quietly fade into history.</p>
+    </div>
+</div>
+
+<div id="installModal" class="modal" onclick="hideModals()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-x" onclick="hideModals()">×</span>
         <h3>📱 Install</h3>
-        <p>Add to your home screen.</p>
-        <p>🍏 <strong>iPhone (Safari):</strong><br>Tap Share, then Add to Home Screen.</p>
-        <p>🤖 <strong>Android (Chrome):</strong><br>Tap Menu (⋮), then Add to Home Screen.</p>
+        <p>🍏 <strong>iPhone:</strong> Tap Share, then Add to Home Screen.</p>
+        <p>🤖 <strong>Android:</strong> Tap Menu (⋮), then Add to Home Screen.</p>
     </div>
 </div>
 
 <script>
     const input = document.getElementById('wordInput');
-    const display = document.getElementById('displayWord');
-    const historyContainer = document.getElementById('historyList');
+    const display = document.getElementById('mainDisplay');
+    const clrBtn = document.getElementById('clrBtn');
+    const inputSection = document.getElementById('inputSection');
+    const historyList = document.getElementById('historyList');
 
-    // Load data
-    let storageData = JSON.parse(localStorage.getItem('theWord_logs')) || {};
-    const today = new Date().toISOString().split('T')[0];
+    let logs = JSON.parse(localStorage.getItem('theWord_logs')) || {};
 
     function init() {
-        if (storageData[today]) {
-            input.value = storageData[today];
-            updateDisplay(storageData[today]);
+        const today = new Date().toISOString().split('T')[0];
+        if (logs[today]) {
+            display.textContent = logs[today];
+            inputSection.style.display = 'none';
+        } else {
+            display.innerHTML = '<span class="guide-text">Your word here.</span>';
+            inputSection.style.display = 'block';
         }
         renderHistory();
     }
 
-    input.addEventListener('input', (e) => {
-        // Space removal (Strict 1 word)
-        let val = e.target.value.replace(/\s/g, '');
-        e.target.value = val;
-        
-        if (val) {
-            updateDisplay(val);
-            storageData[today] = val;
-        } else {
-            display.textContent = "Focus";
-            display.classList.add('placeholder-text');
-            delete storageData[today];
-        }
-        localStorage.setItem('theWord_logs', JSON.stringify(storageData));
-        renderHistory();
-    });
+    function toggleClr() {
+        // Space restricted
+        input.value = input.value.replace(/\s/g, '');
+        clrBtn.classList.toggle('active', input.value.length > 0);
+    }
 
-    function updateDisplay(val) {
-        display.textContent = val;
-        display.classList.remove('placeholder-text');
+    function clearInput() {
+        input.value = '';
+        toggleClr();
+        input.focus();
+    }
+
+    function setWord() {
+        const val = input.value.trim();
+        if (!val) return;
+        const today = new Date().toISOString().split('T')[0];
+        logs[today] = val;
+        localStorage.setItem('theWord_logs', JSON.stringify(logs));
         
-        // Font size scaling based on length
-        if (val.length > 8) {
-            display.style.fontSize = '2.5rem';
-        } else if (val.length > 5) {
-            display.style.fontSize = '3.2rem';
-        } else {
-            display.style.fontSize = '4rem';
-        }
+        display.textContent = val;
+        inputSection.style.display = 'none';
+        renderHistory();
+    }
+
+    function reEdit() {
+        const today = new Date().toISOString().split('T')[0];
+        if (!logs[today]) return;
+        input.value = logs[today];
+        inputSection.style.display = 'block';
+        toggleClr();
     }
 
     function renderHistory() {
-        historyContainer.innerHTML = '';
-        const sortedDates = Object.keys(storageData).sort().reverse();
+        historyList.innerHTML = '';
+        const today = new Date().toISOString().split('T')[0];
+        const dates = Object.keys(logs).sort().reverse();
         
-        // Display last 7 days (excluding today)
         let count = 0;
-        sortedDates.forEach(date => {
-            if (date === today) return;
-            if (count >= 7) return;
+        for (const date of dates) {
+            if (date === today) continue;
+            if (count >= 7) break;
 
             const item = document.createElement('div');
             item.className = 'history-item';
-            
-            // Gradual fading for older items
-            const opacity = 1 - (count * 0.12);
-            item.style.opacity = opacity;
+            item.style.opacity = 1 - (count * 0.12); // Fading effect
 
-            const dateObj = new Date(date);
-            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const d = new Date(date);
+            const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-            item.innerHTML = `
-                <span class="history-word">${storageData[date]}</span>
-                <span class="history-date">${formattedDate}</span>
-            `;
-            historyContainer.appendChild(item);
+            item.innerHTML = `<span class="h-word">${logs[date]}</span><span class="h-date">${dateStr}</span>`;
+            historyList.appendChild(item);
             count++;
-        });
+        }
     }
 
-    function showModal() { document.getElementById('modal').style.display = 'flex'; }
-    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+    function showAbout() { document.getElementById('aboutModal').style.display = 'flex'; }
+    function showInstall() { document.getElementById('installModal').style.display = 'flex'; }
+    function hideModals() { 
+        document.getElementById('aboutModal').style.display = 'none';
+        document.getElementById('installModal').style.display = 'none';
+    }
 
     init();
 </script>
