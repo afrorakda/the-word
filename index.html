@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Word</title>
+    
+    <link rel="icon" href="image_75.png">
+    <link rel="apple-touch-icon" href="image_75.png">
+
+    <style>
+        :root {
+            --main: #333;
+            --bg: #fff;
+            --accent: #eee;
+            --input-bg: #fafafa;
+            --radius: 15px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px; }
+        .subtitle { font-size: 0.85rem; color: #666; font-weight: 500; margin-bottom: 30px; }
+
+        /* Current Word Display */
+        .current-word-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 200px;
+            padding: 20px 0;
+        }
+
+        .current-word {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            word-wrap: break-word;
+            line-height: 1;
+        }
+
+        .placeholder-text {
+            color: #ddd;
+            font-style: italic;
+        }
+
+        /* Input Area */
+        .input-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .word-input {
+            width: 100%;
+            padding: 18px;
+            border: 2px solid var(--accent);
+            border-radius: var(--radius);
+            background: var(--input-bg);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--main) !important;
+            box-sizing: border-box;
+            outline: none;
+            -webkit-appearance: none;
+            -webkit-text-fill-color: var(--main) !important;
+            opacity: 1 !important;
+            text-align: center;
+        }
+        .word-input::placeholder { color: #bbb; -webkit-text-fill-color: #bbb; }
+
+        /* History Area */
+        .history-list {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .history-date { font-size: 0.75rem; font-weight: 600; color: #aaa; }
+        .history-word { font-size: 1.1rem; font-weight: 800; }
+
+        footer { margin-top: auto; font-size: 11px; color: #aaa; line-height: 1.8; }
+        footer a { color: inherit; text-decoration: none; }
+        .footer-btns { margin-top: 30px; }
+        .kofi-btn {
+            display: inline-block; background: var(--main); color: #fff;
+            padding: 12px 25px; border-radius: var(--radius);
+            text-decoration: none; font-weight: bold; font-size: 14px; margin-bottom: 12px;
+        }
+        .home-btn {
+            display: block; width: 60%; margin: 0 auto; background: var(--accent);
+            color: var(--main); border: none; padding: 10px;
+            border-radius: var(--radius); font-weight: 700; font-size: 13px; cursor: pointer;
+        }
+
+        #modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-content {
+            background: #fff; width: 85%; max-width: 320px; padding: 30px;
+            border-radius: var(--radius); text-align: left; position: relative;
+        }
+        .close-x { position: absolute; top: 15px; right: 20px; font-size: 20px; color: #ccc; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>The Word</h1>
+    <p class="subtitle">Define your day in one single word.</p>
+
+    <div class="current-word-container">
+        <div id="displayWord" class="current-word placeholder-text">Focus</div>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="wordInput" class="word-input" placeholder="Enter today's word" maxlength="20">
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+
+    <div class="footer-btns">
+        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
+        <button class="home-btn" onclick="showModal()">Add to Home Screen</button>
+    </div>
+
+    <footer>
+        <div>No login / No tracking / No ads / Browser only</div>
+        <div><a href="https://afrorakda.com/privacy/">Privacy Policy</a> / afrorakda © 2026</div>
+    </footer>
+</div>
+
+<div id="modal" onclick="hideModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-x" onclick="hideModal()">×</span>
+        <h3>📱 Install</h3>
+        <p>Add to your home screen.</p>
+        <p>🍏 <strong>iPhone (Safari):</strong><br>Tap Share, then Add to Home Screen.</p>
+        <p>🤖 <strong>Android (Chrome):</strong><br>Tap Menu (⋮), then Add to Home Screen.</p>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('wordInput');
+    const display = document.getElementById('displayWord');
+    const historyContainer = document.getElementById('historyList');
+
+    // Load data
+    let storageData = JSON.parse(localStorage.getItem('theWord_logs')) || {};
+    const today = new Date().toISOString().split('T')[0];
+
+    function init() {
+        if (storageData[today]) {
+            input.value = storageData[today];
+            updateDisplay(storageData[today]);
+        }
+        renderHistory();
+    }
+
+    input.addEventListener('input', (e) => {
+        // Space removal (Strict 1 word)
+        let val = e.target.value.replace(/\s/g, '');
+        e.target.value = val;
+        
+        if (val) {
+            updateDisplay(val);
+            storageData[today] = val;
+        } else {
+            display.textContent = "Focus";
+            display.classList.add('placeholder-text');
+            delete storageData[today];
+        }
+        localStorage.setItem('theWord_logs', JSON.stringify(storageData));
+        renderHistory();
+    });
+
+    function updateDisplay(val) {
+        display.textContent = val;
+        display.classList.remove('placeholder-text');
+        
+        // Font size scaling based on length
+        if (val.length > 8) {
+            display.style.fontSize = '2.5rem';
+        } else if (val.length > 5) {
+            display.style.fontSize = '3.2rem';
+        } else {
+            display.style.fontSize = '4rem';
+        }
+    }
+
+    function renderHistory() {
+        historyContainer.innerHTML = '';
+        const sortedDates = Object.keys(storageData).sort().reverse();
+        
+        // Display last 7 days (excluding today)
+        let count = 0;
+        sortedDates.forEach(date => {
+            if (date === today) return;
+            if (count >= 7) return;
+
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            
+            // Gradual fading for older items
+            const opacity = 1 - (count * 0.12);
+            item.style.opacity = opacity;
+
+            const dateObj = new Date(date);
+            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+            item.innerHTML = `
+                <span class="history-word">${storageData[date]}</span>
+                <span class="history-date">${formattedDate}</span>
+            `;
+            historyContainer.appendChild(item);
+            count++;
+        });
+    }
+
+    function showModal() { document.getElementById('modal').style.display = 'flex'; }
+    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+
+    init();
+</script>
+
+</body>
+</html>
